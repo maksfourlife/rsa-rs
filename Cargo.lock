@@ -160,21 +160,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lab3"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64",
- "bincode",
- "clap",
- "num-bigint-dig",
- "num-integer",
- "num-traits",
- "rand",
- "serde",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -336,6 +321,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
+]
+
+[[package]]
+name = "rsa"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "bincode",
+ "clap",
+ "num-bigint-dig",
+ "num-integer",
+ "num-traits",
+ "rand",
+ "serde",
 ]
 
 [[package]]
