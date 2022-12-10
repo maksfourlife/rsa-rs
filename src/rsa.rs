@@ -5,44 +5,6 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::ops::AddAssign;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PubKey {
-    e: BigUint,
-    n: BigUint,
-}
-
-impl PubKey {
-    pub fn encrypt(&self, data: impl AsRef<[u8]>) -> Vec<u8> {
-        data.as_ref()
-            .chunks((self.n.bits() / 8) as usize)
-            .flat_map(|ch| {
-                let m = BigUint::from_bytes_be(ch);
-                let c = m.modpow(&self.e, &self.n);
-                c.to_bytes_be()
-            })
-            .collect()
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PrivKey {
-    d: BigUint,
-    n: BigUint,
-}
-
-impl PrivKey {
-    pub fn decrypt(&self, data: impl AsRef<[u8]>) -> Vec<u8> {
-        data.as_ref()
-            .chunks(self.n.bits() / 8)
-            .flat_map(|ch| {
-                let c = BigUint::from_bytes_be(ch);
-                let m = c.modpow(&self.d, &self.n);
-                m.to_bytes_be()
-            })
-            .collect()
-    }
-}
-
 pub fn gen_keypair(bits: usize) -> (PubKey, PrivKey) {
     gen_keypair_with_rng(bits, &mut rand::thread_rng())
 }
@@ -66,4 +28,39 @@ pub fn gen_keypair_with_rng<R: Rng>(bits: usize, rng: &mut R) -> (PubKey, PrivKe
             n,
         },
     )
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PubKey {
+    e: BigUint,
+    n: BigUint,
+}
+
+impl PubKey {
+    pub fn encrypt(&self, data: impl AsRef<[u8]>) -> Vec<u8> {
+        chunked_modpow(data, &self.e, &self.n)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PrivKey {
+    d: BigUint,
+    n: BigUint,
+}
+
+impl PrivKey {
+    pub fn decrypt(&self, data: impl AsRef<[u8]>) -> Vec<u8> {
+        chunked_modpow(data, &self.d, &self.n)
+    }
+}
+
+fn chunked_modpow(data: impl AsRef<[u8]>, exponent: &BigUint, modulo: &BigUint) -> Vec<u8> {
+    data.as_ref()
+        .chunks(modulo.bits() / 8)
+        .flat_map(|ch| {
+            let c = BigUint::from_bytes_be(ch);
+            let m = c.modpow(exponent, modulo);
+            m.to_bytes_be()
+        })
+        .collect()
 }
