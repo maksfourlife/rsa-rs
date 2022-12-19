@@ -1,17 +1,23 @@
-use num_bigint_dig::{prime::next_prime, BigUint, RandBigInt, RandPrime, ToBigInt};
+use num_bigint_dig::{prime::next_prime, BigUint, RandBigInt, ToBigInt};
 use num_integer::Integer;
 use num_traits::{one, Signed};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::ops::AddAssign;
 
+use crate::math::RandomPrimeIterator;
+
 pub fn gen_keypair(bits: usize) -> (PubKey, PrivKey) {
     gen_keypair_with_rng(bits, &mut rand::thread_rng())
 }
 
 pub fn gen_keypair_with_rng<R: Rng>(bits: usize, rng: &mut R) -> (PubKey, PrivKey) {
-    let p = rng.gen_prime(bits);
-    let q = rng.gen_prime(bits);
+    let mut rand_primes = RandomPrimeIterator::new_with_rng(bits, rng);
+    // let p = rng.gen_prime(bits);
+    // let q = rng.gen_prime(bits);
+    // nums can be close to each other
+    let p = rand_primes.next().unwrap();
+    let q = rand_primes.next().unwrap();
     let n = &p * &q;
     let _1: BigUint = one();
     let phi = (&p - &_1) * (&q - &_1);

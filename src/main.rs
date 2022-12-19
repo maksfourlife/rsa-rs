@@ -9,6 +9,7 @@ use std::{
 };
 
 pub mod cli;
+pub mod math;
 pub mod rsa;
 
 fn base64_decode<T: DeserializeOwned>(input: impl AsRef<[u8]>) -> anyhow::Result<T> {
